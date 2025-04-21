@@ -1,0 +1,62 @@
+{
+  "expo": {
+    "name": "laguz",
+    "slug": "laguz",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "scheme": "laguz",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.dabra.laguz",
+      "icon": {
+        "dark": "./assets/icons/ios-dark.png",
+        "light": "./assets/icons/ios-light.png",
+        "tinted": "./assets/icons/ios-tinted.png"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icons/adaptive-icon.png",
+        "monochromeImage": "./assets/icons/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "com.dabra.laguz"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/icons/splash-icon-dark.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "image": "./assets/icons/splash-icon-light.png",
+            "backgroundColor": "#000000"
+          }
+        }
+      ],
+      [
+        "expo-dev-client",
+        {
+          "ios": {
+            "bundleIdentifier": "com.dabra.laguz.dev"
+          },
+          "android": {
+            "package": "com.dabra.laguz.dev"
+          }
+        }
+      ],
+      "expo-localization",
+      [
+        "expo-font",
+        {
+          "fonts": ["./assets/fonts/Norse-Bold.otf", "./assets/fonts/Norse.otf"]
+        }
+      ]
+    ]
+  }
+}
