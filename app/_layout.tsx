@@ -1,63 +1,66 @@
+import { useSetupTrackPlayer } from '@/hooks/useSetupTrackPlayer';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Theme, ThemeProvider, DefaultTheme, DarkTheme } from '@react-navigation/native';
-import { NAV_THEME } from '@/lib/constants';
-import { useColorScheme } from '@/lib/useColorScheme';
-import { useFonts } from 'expo-font';
-
-const LIGHT_THEME: Theme = {
-  ...DefaultTheme,
-  colors: NAV_THEME.light,
-};
-const DARK_THEME: Theme = {
-  ...DarkTheme,
-  colors: NAV_THEME.dark,
-};
+import { SplashScreen } from 'expo-router';
+import { useCallback } from 'react';
+import { useLogTrackPlayerState } from '@/hooks/useLogTrackPlayerState';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { colors } from '@/constants/tokens';
+import { playbackService } from '@/constants/playbackService';
+import TrackPlayer from 'react-native-track-player';
 
 SplashScreen.preventAutoHideAsync();
 
-const RootLayout = () => {
-  const hasMounted = useRef(false);
-  const { isDarkColorScheme } = useColorScheme();
-  const [isColorSchemeLoaded, setIsColorSchemeLoaded] = useState(false);
-  const [isFontLoaded, isFontError] = useFonts({
-    Norse: require('@/assets/fonts/Norse.otf'),
-    'Norse-Bold': require('@/assets/fonts/Norse-Bold.otf'),
-  });
+TrackPlayer.registerPlaybackService(() => playbackService);
 
-  useLayoutEffect(() => {
-    if (hasMounted.current) {
-      return;
-    }
-
-    setIsColorSchemeLoaded(true);
-    hasMounted.current = true;
+const App = () => {
+  const handleTrackPlayerLoaded = useCallback(() => {
     SplashScreen.hideAsync();
   }, []);
 
-  useEffect(() => {
-    if (isFontLoaded || isFontError) {
-      SplashScreen.hideAsync();
-    }
-  }, [isFontLoaded, isFontError]);
-
-  if (!isColorSchemeLoaded || (!isFontLoaded && !isFontError)) {
-    return null;
-  }
+  useSetupTrackPlayer({ onLoad: handleTrackPlayerLoaded });
+  useLogTrackPlayerState();
 
   return (
-    <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-      <SafeAreaProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <RootNavigation />
         <StatusBar style="auto" />
-      </SafeAreaProvider>
-    </ThemeProvider>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 };
 
-export default RootLayout;
+const RootNavigation = () => {
+  return (
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="player"
+        options={{
+          presentation: 'card',
+          gestureEnabled: true,
+          gestureDirection: 'vertical',
+          animationDuration: 400,
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="(modals)/addToPlaylist"
+        options={{
+          presentation: 'modal',
+          headerStyle: {
+            backgroundColor: colors.background,
+          },
+          headerTitle: 'Add to playlist',
+          headerTitleStyle: {
+            color: colors.text,
+          },
+        }}
+      />
+    </Stack>
+  );
+};
+
+export default App;
